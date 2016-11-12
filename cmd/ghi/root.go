@@ -35,12 +35,9 @@ func NewCmdRoot(out io.Writer) *cobra.Command {
 	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
 	cmd.PersistentFlags().StringVar(&rootCommand.configFile, "config", "", "config file (default is $HOME/.ghi.yaml)")
 
-	// defaultStateStore := os.Getenv("KOPS_STATE_STORE")
-
 	// create subcommands
-	// cmd.AddCommand(NewCmdCreate(f, out))
-	// cmd.AddCommand(NewCmdEdit(f, out))
-	// cmd.AddCommand(NewCmdUpdate(f, out))
+	cmd.AddCommand(NewCmdCreate(out))
+	// cmd.AddCommand(NewLoginCommand(out))
 
 	return cmd
 }
@@ -58,7 +55,13 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		if viper.IsSet("show_viper_config_file") {
+			if viper.GetBool("show_viper_config_file") {
+				fmt.Println("Using config file:", viper.ConfigFileUsed())
+			}
+		} else {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		}
 	}
 }
 

@@ -1,21 +1,26 @@
 # github-cli
 
-Easy way to manage common github tasks using command line
+Perform github tasks from command line
+
+## Prerequisite
+
+[Setup golang environment](https://golang.org/doc/install)
 
 ## Installation
 
 Install the cli with the following command
-```
-go get github.com/alok87/github-cli/cmd/ghi
+```bash
+> go get github.com/alok87/github-cli/cmd/ghi
 ```
 
 ## Usage
 
-```
-ghi --help
-```
+![Help](http://i.imgur.com/mRGLoGS.png)
 
 ## Features
 
-- Repo
-    - Create Repo
+###  Create
+* Create Repo
+```bash
+> ghi create repo luna
+```

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/alok87/github-cli/pkg/client/ghub"
+	"github.com/alok87/github-cli/pkg/ghub"
 	"io"
 	"os"
 )

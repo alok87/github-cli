@@ -11,15 +11,6 @@ var (
 
 func main() {
 	Execute()
-	// viper.SetConfigName(".ghi")
-	// viper.AddConfigPath("$HOME")
-	// viper.SetConfigType("json")
-	// err := viper.ReadInConfig()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	fmt.Println("No configuration file loaded - using defaults")
-	// }
-	// fmt.Println(viper.Get("msg")) // this would be "steve"
 }
 
 // exitWithError will terminate execution with an error result

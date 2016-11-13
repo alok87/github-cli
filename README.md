@@ -4,7 +4,8 @@ Perform github tasks from command line
 
 ## Prerequisite
 
-[Setup golang environment](https://golang.org/doc/install)
+* [Setup golang environment](https://golang.org/doc/install)
+* [How to organize go code](https://golang.org/doc/code.html)
 
 ## Installation
 
@@ -29,4 +30,10 @@ Install the cli with the following command
 * Create Repo
 ```bash
 > ghi create repo luna
+```
+
+###  Delete
+* Delete Repo
+```bash
+> ghi delete repo luna
 ```

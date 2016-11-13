@@ -14,6 +14,7 @@ import (
 type Gclient struct {
 	Name   string
 	client *github.Client
+	User   string
 }
 
 func (c *Gclient) SetClient() {
@@ -50,6 +51,8 @@ func (c *Gclient) SetClient() {
 	)
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 	c.client = github.NewClient(tc)
+	currentUser, _, _ := c.client.Users.Get("")
+	c.User = *currentUser.Login
 }
 
 func (c *Gclient) GetClient() *github.Client {

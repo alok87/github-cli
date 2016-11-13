@@ -42,9 +42,9 @@ func NewCmdRoot(out io.Writer) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&rootCommand.configFile, "config", "", "config file (default is $HOME/.ghi.yaml)")
 
 	// create subcommands
-	cmd.AddCommand(NewCmdCreate(out))
 	cmd.AddCommand(NewCmdLogin(out))
-	// cmd.AddCommand(NewLoginCommand(out))
+	cmd.AddCommand(NewCmdCreate(out))
+	cmd.AddCommand(NewCmdDelete(out))
 
 	return cmd
 }

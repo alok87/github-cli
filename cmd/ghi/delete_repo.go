@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/alok87/github-cli/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +40,7 @@ func RunDeleteRepo(cmd *cobra.Command, args []string, out io.Writer, o *DeleteRe
 	client := rootCommand.gclient.GetClient()
 	user := rootCommand.gclient.User
 	repoUrl := user + "/" + repoName
-	c := askForConfirmation("Are you sure you want to delete " + repoUrl + " ?")
+	c := utils.AskForConfirmation("Are you sure you want to delete " + repoUrl + " ?")
 	if c {
 		_, err := client.Repositories.Delete(user, repoName)
 		if err != nil {

@@ -1,46 +1,60 @@
 package ghub
 
 import (
-    "github.com/google/go-github/github"
-    "golang.org/x/oauth2"
-    "github.com/spf13/viper"
-    "fmt"
-    "os"
+	"fmt"
+	"os"
+	"os/exec"
+	"syscall"
+
+	"github.com/google/go-github/github"
+	"github.com/spf13/viper"
+	"golang.org/x/oauth2"
 )
 
 type Gclient struct {
-    Name string
-    client *github.Client
+	Name   string
+	client *github.Client
 }
 
 func (c *Gclient) SetClient() {
-    var gitOauth string
-    configName := ".ghi"
-    configType := "yaml"
+	var gitOauth string
+	configName := ".ghi"
+	configType := "yaml"
 
-    // TODO: Find a better approach than intializing config in this way
-    viper.SetConfigName(configName)
-    viper.AddConfigPath("$HOME")
-    viper.SetConfigType(configType)
+	// TODO: Find a better approach than intializing config in this way
+	viper.SetConfigName(configName)
+	viper.AddConfigPath("$HOME")
+	viper.SetConfigType(configType)
 
-    if err := viper.ReadInConfig(); err == nil {
+	if err := viper.ReadInConfig(); err == nil {
 		if viper.IsSet("git_oauth") {
-            gitOauth = viper.GetString("git_oauth")
+			gitOauth = viper.GetString("git_oauth")
 		}
 	}
-    if len(gitOauth) == 0  {
-        exitWithError(fmt.Errorf("Missing git_oauth in configfile %s.%s",
-                                 configName, configType))
-    }
-    ts := oauth2.StaticTokenSource(
-        &oauth2.Token{AccessToken: gitOauth},
-    )
-    tc := oauth2.NewClient(oauth2.NoContext, ts)
-    c.client = github.NewClient(tc)
+	if len(gitOauth) == 0 {
+		fmt.Println("Login required !")
+		binary, lookErr := exec.LookPath("ghi")
+		if lookErr != nil {
+			exitWithError(fmt.Errorf("Binary ghi not found"))
+		}
+		args := []string{"ghi", "login"}
+		env := os.Environ()
+		execErr := syscall.Exec(binary, args, env)
+		if execErr != nil {
+			exitWithError(fmt.Errorf("Error running ghi login"))
+		}
+		exitWithError(fmt.Errorf("Login required"))
+	}
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: gitOauth},
+	)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	c.client = github.NewClient(tc)
 }
 
 func (c *Gclient) GetClient() *github.Client {
-    return c.client
+	c.SetClient()
+	return c.client
 }
 
 // exitWithError will terminate execution with an error result

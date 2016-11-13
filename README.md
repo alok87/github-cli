@@ -19,6 +19,12 @@ Install the cli with the following command
 
 ## Features
 
+### Login
+* Setup Login to access Github
+```bash
+> ghi login my_github_oauth_token
+```
+
 ###  Create
 * Create Repo
 ```bash

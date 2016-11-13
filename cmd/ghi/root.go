@@ -3,17 +3,18 @@ package main
 import (
 	goflag "flag"
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/alok87/github-cli/pkg/ghub"
 	"io"
 	"os"
+
+	"github.com/alok87/github-cli/pkg/ghub"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type RootCmd struct {
 	configFile   string
 	cobraCommand *cobra.Command
-	gclient *ghub.Gclient
+	gclient      *ghub.Gclient
 }
 
 var rootCommand = RootCmd{
@@ -28,7 +29,6 @@ var rootCommand = RootCmd{
 }
 
 func init() {
-	rootCommand.gclient.SetClient()
 	cobra.OnInitialize(initConfig)
 	NewCmdRoot(os.Stdout)
 }
@@ -43,6 +43,7 @@ func NewCmdRoot(out io.Writer) *cobra.Command {
 
 	// create subcommands
 	cmd.AddCommand(NewCmdCreate(out))
+	cmd.AddCommand(NewCmdLogin(out))
 	// cmd.AddCommand(NewLoginCommand(out))
 
 	return cmd

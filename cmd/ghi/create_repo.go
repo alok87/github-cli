@@ -1,19 +1,21 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/google/go-github/github"
+	"fmt"
 	"io"
-    "fmt"
+	"strings"
+
+	"github.com/google/go-github/github"
+	"github.com/spf13/cobra"
 )
 
 type CreateRepoOptions struct {
-    Name string
-    IsPrivate string
+	Name      string
+	IsPrivate string
 }
 
 func NewCmdCreateRepo(out io.Writer) *cobra.Command {
-    options := &CreateRepoOptions{}
+	options := &CreateRepoOptions{}
 
 	cmd := &cobra.Command{
 		Use:   "repo [name]",
@@ -27,7 +29,7 @@ func NewCmdCreateRepo(out io.Writer) *cobra.Command {
 		},
 	}
 
-    return cmd
+	return cmd
 }
 
 func RunCreateRepo(cmd *cobra.Command, args []string, out io.Writer, c *CreateRepoOptions) error {
@@ -41,9 +43,12 @@ func RunCreateRepo(cmd *cobra.Command, args []string, out io.Writer, c *CreateRe
 		Name:    github.String(repoName),
 		Private: github.Bool(false),
 	}
-	_, _, err:= client.Repositories.Create("", repo)
+	_, _, err := client.Repositories.Create("", repo)
 	if err != nil {
-		return err
+		if strings.Fields(err.Error())[2] == "422" {
+			exitWithError(fmt.Errorf("Repo %s already exists", repoName))
+		}
+		exitWithError(err)
 	}
 	fmt.Printf("Repo %s created in github", repoName)
 	return nil

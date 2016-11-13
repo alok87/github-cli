@@ -17,6 +17,6 @@ func NewCmdCreate(out io.Writer) *cobra.Command {
 	}
 
 	// create subcommands
-	// cmd.AddCommand(NewCmdCreateRepo(out))
+	cmd.AddCommand(NewCmdCreateRepo(out))
 	return cmd
 }

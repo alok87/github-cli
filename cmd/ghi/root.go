@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/alok87/github-cli/pkg/client/ghub"
 	"io"
 	"os"
 )
@@ -12,6 +13,7 @@ import (
 type RootCmd struct {
 	configFile   string
 	cobraCommand *cobra.Command
+	gclient *ghub.Gclient
 }
 
 var rootCommand = RootCmd{
@@ -20,9 +22,13 @@ var rootCommand = RootCmd{
 		Short: "ghi is github-cli to perform github tasks.",
 		Long:  `ghi is github-cli to perform github tasks.`,
 	},
+	gclient: &ghub.Gclient{
+		Name: "Github Client",
+	},
 }
 
 func init() {
+	rootCommand.gclient.SetClient()
 	cobra.OnInitialize(initConfig)
 	NewCmdRoot(os.Stdout)
 }

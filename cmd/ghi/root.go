@@ -35,7 +35,6 @@ func init() {
 
 func NewCmdRoot(out io.Writer) *cobra.Command {
 	//options := &RootOptions{}
-
 	cmd := rootCommand.cobraCommand
 
 	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)

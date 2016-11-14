@@ -45,7 +45,7 @@ func RunGetRepos(cmd *cobra.Command, args []string, out io.Writer, c *GetRepoOpt
 	opt := &github.RepositoryListOptions{Type: "all", Sort: "updated"}
 	repos, _, err := client.Repositories.List(user, opt)
 	if err != nil {
-		exitWithError(fmt.Errorf("err"))
+		exitWithError(fmt.Errorf("Error Getting Repos"))
 	}
 	if len(repos) == 0 {
 		fmt.Fprintf(os.Stderr, "No repos found\n")

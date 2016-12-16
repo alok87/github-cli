@@ -44,7 +44,25 @@ Install the cli with the following command
 > ghi delete repo luna
 ```
 
+
 ## Contribution
+
+### Development Setup
+
+1. Clone the repo & `cd` into it.
+2. Ensure that [`govendor`](https://github.com/kardianos/govendor) is installed
+and install all the vendor dependencies with `govendor sync`.
+3. Install with:
+```
+go install github.com/alok87/github-cli/cmd/ghi
+```
+
+#### Dependencies
+
+Add new dependencies with `govendor fetch <packagename>`. This would install
+the dependencies under `vendor/` and add them to `vendor/vendor.json`, which
+should be checked-in.
+
 
 ### Resources:
 `ghi` can easily be extended.
@@ -53,10 +71,6 @@ Install the cli with the following command
 * [viper](https://github.com/spf13/viper)
 * [cobra](https://github.com/spf13/cobra)
 
-### Build and Install
-```bash
-> go install github.com/alok87/github-cli/cmd/ghi
-```
 
 ### Pull requests are welcome !
 * [How to give a PR for a Golang project?](http://blog.campoy.cat/2014/03/github-and-go-forking-pull-requests-and.html)

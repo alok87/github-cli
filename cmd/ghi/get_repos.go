@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/google/go-github/github"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"k8s.io/kops/util/pkg/tables"
 )
 
 type GetRepoOptions struct {
@@ -51,22 +52,17 @@ func RunGetRepos(cmd *cobra.Command, args []string, out io.Writer, c *GetRepoOpt
 		fmt.Fprintf(os.Stderr, "No repos found\n")
 		return nil
 	}
-	t := &tables.Table{}
-	t.AddColumn("REPO", func(r *github.Repository) string {
-		return *r.HTMLURL
-	})
-	t.AddColumn("LANGUAGE", func(r *github.Repository) string {
-		if r.Language != nil {
-			return *r.Language
-		} else {
-			return "-"
-		}
-	})
-	t.AddColumn("STARS", func(r *github.Repository) int {
-		return *r.StargazersCount
-	})
-	t.AddColumn("FORKS", func(r *github.Repository) int {
-		return *r.ForksCount
-	})
-	return t.Render(repos, os.Stdout, "REPO", "LANGUAGE", "STARS", "FORKS")
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"REPO", "LANGUAGE", "STARS", "FORKS"})
+
+	for _, repo := range repos {
+		table.Append([]string{*repo.HTMLURL, *repo.Language,
+			strconv.Itoa(*repo.StargazersCount),
+			strconv.Itoa(*repo.ForksCount)})
+	}
+
+	table.Render()
+
+	return nil
 }

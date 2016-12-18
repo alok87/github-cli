@@ -1,6 +1,6 @@
 # github-cli
 
-Perform github tasks from command line
+Perform github tasks from command line.
 
 ## Prerequisite
 
@@ -11,7 +11,7 @@ Perform github tasks from command line
 
 Install the cli with the following command
 ```bash
-> go get github.com/alok87/github-cli/cmd/ghi
+> go get github.com/alok87/github-cli
 ```
 
 ## Usage
@@ -23,25 +23,25 @@ Install the cli with the following command
 ### Login
 * Setup Login to access Github
 ```bash
-> ghi login my_github_oauth_token
+> github-cli login my_github_oauth_token
 ```
 
 ###  Get
 * Get Repos
 ```bash
-> ghi get repos
+> github-cli get repos
 ```
 
 ###  Create
 * Create Repo
 ```bash
-> ghi create repo luna
+> github-cli create repo luna
 ```
 
 ###  Delete
 * Delete Repo
 ```bash
-> ghi delete repo luna
+> github-cli delete repo luna
 ```
 
 
@@ -54,7 +54,7 @@ Install the cli with the following command
 and install all the vendor dependencies with `govendor sync`.
 3. Install with:
 ```
-go install github.com/alok87/github-cli/cmd/ghi
+go install github.com/alok87/github-cli
 ```
 
 #### Dependencies
@@ -65,7 +65,7 @@ should be checked-in.
 
 
 ### Resources:
-`ghi` can easily be extended.
+`github-cli` can easily be extended.
 
 * [go-github docs](https://godoc.org/github.com/google/go-github/github)
 * [viper](https://github.com/spf13/viper)

@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func RunLogin(cmd *cobra.Command, args []string, out io.Writer) error {
 	}
 	gitOauth := args[0]
 	configPath := os.Getenv("HOME")
-	configName := ".ghi"
+	configName := ".github-cli"
 	configType := "yaml"
 	var configYaml []byte
 	var madeConfigFile = false

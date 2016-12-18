@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	goflag "flag"
@@ -19,9 +19,9 @@ type RootCmd struct {
 
 var rootCommand = RootCmd{
 	cobraCommand: &cobra.Command{
-		Use:   "ghi",
-		Short: "ghi is github-cli to perform github tasks.",
-		Long:  `ghi is github-cli to perform github tasks.`,
+		Use:   "github-cli",
+		Short: "Use github-cli to perform github tasks.",
+		Long:  "Use github-cli to perform github tasks.",
 	},
 	gclient: &ghub.Gclient{
 		Name: "Github Client",
@@ -38,7 +38,7 @@ func NewCmdRoot(out io.Writer) *cobra.Command {
 	cmd := rootCommand.cobraCommand
 
 	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
-	cmd.PersistentFlags().StringVar(&rootCommand.configFile, "config", "", "config file (default is $HOME/.ghi.yaml)")
+	cmd.PersistentFlags().StringVar(&rootCommand.configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
 
 	// create subcommands
 	cmd.AddCommand(NewCmdLogin(out))
@@ -56,12 +56,13 @@ func initConfig() {
 		viper.SetConfigFile(rootCommand.configFile)
 	}
 
-	viper.SetConfigName(".ghi")  // name of config file (without extension)
-	viper.AddConfigPath("$HOME") // adding home directory as first search path
-	viper.AutomaticEnv()         // read in environment variables that match
+	viper.SetConfigName(".github-cli") // name of config file (without extension)
+	viper.AddConfigPath("$HOME")       // adding home directory as first search path
+	viper.AutomaticEnv()               // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
+		// Print config file name based on `show_vuper_config_file`.
 		if viper.IsSet("show_viper_config_file") {
 			if viper.GetBool("show_viper_config_file") {
 				fmt.Println("Using config file:", viper.ConfigFileUsed())
@@ -82,4 +83,11 @@ func Execute() {
 	if err := rootCommand.cobraCommand.Execute(); err != nil {
 		exitWithError(err)
 	}
+}
+
+// exitWithError will terminate execution with an error result
+// It prints the error to stderr and exits with a non-zero exit code
+func exitWithError(err error) {
+	fmt.Fprintf(os.Stderr, "%v\n", err)
+	os.Exit(1)
 }

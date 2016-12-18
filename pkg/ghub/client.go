@@ -19,7 +19,7 @@ type Gclient struct {
 
 func (c *Gclient) SetClient() {
 	var gitOauth string
-	configName := ".ghi"
+	configName := ".github-cli"
 	configType := "yaml"
 
 	// TODO: Find a better approach than intializing config in this way
@@ -35,15 +35,15 @@ func (c *Gclient) SetClient() {
 
 	if len(gitOauth) == 0 {
 		fmt.Println("Login required !")
-		binary, lookErr := exec.LookPath("ghi")
+		binary, lookErr := exec.LookPath("github-cli")
 		if lookErr != nil {
-			exitWithError(fmt.Errorf("Binary ghi not found"))
+			exitWithError(fmt.Errorf("Binary github-cli not found"))
 		}
-		args := []string{"ghi", "login"}
+		args := []string{"github-cli", "login"}
 		env := os.Environ()
 		execErr := syscall.Exec(binary, args, env)
 		if execErr != nil {
-			exitWithError(fmt.Errorf("Error running ghi login"))
+			exitWithError(fmt.Errorf("Error running github-cli login"))
 		}
 		exitWithError(fmt.Errorf("Login required"))
 	}

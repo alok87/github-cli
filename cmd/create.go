@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"io"
@@ -6,17 +6,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCmdDelete(out io.Writer) *cobra.Command {
+func NewCmdCreate(out io.Writer) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "delete ",
-		Short: "Delete a resource in github",
+		Use:   "create ",
+		Short: "Create a resource in github",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
 	}
 
 	// create subcommands
-	cmd.AddCommand(NewCmdDeleteRepo(out))
+	cmd.AddCommand(NewCmdCreateRepo(out))
 	return cmd
 }

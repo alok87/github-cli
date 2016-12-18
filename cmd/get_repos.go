@@ -11,11 +11,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var headers = []string{"REPO", "LANGUAGE", "STARS", "FORKS"}
+
 type GetRepoOptions struct {
 	Name      string
 	IsPrivate string
 }
 
+// Struct of a Repo that is used in get_repos table view.
 type Repo struct {
 	URL      string
 	Language string
@@ -23,19 +26,11 @@ type Repo struct {
 	Forks    int
 }
 
+// RepoString converts all the attributes of Repo into an array of strings.
+// Used in appending table in tablewriter.
 func (r Repo) RepoString() []string {
 	return []string{r.URL, r.Language,
 		strconv.Itoa(r.Stars), strconv.Itoa(r.Forks)}
-}
-
-var newRepo = func(r *github.Repository) Repo {
-	var lang string
-	if r.Language != nil {
-		lang = *r.Language
-	} else {
-		lang = "-"
-	}
-	return Repo{*r.HTMLURL, lang, *r.StargazersCount, *r.ForksCount}
 }
 
 func NewCmdGetRepos(out io.Writer) *cobra.Command {
@@ -56,6 +51,18 @@ func NewCmdGetRepos(out io.Writer) *cobra.Command {
 	return cmd
 }
 
+// newRepo creates a new Repo object, given a github repository.
+var newRepo = func(r *github.Repository) Repo {
+	var lang string
+	if r.Language != nil {
+		lang = *r.Language
+	} else {
+		lang = "-"
+	}
+	return Repo{*r.HTMLURL, lang, *r.StargazersCount, *r.ForksCount}
+}
+
+// getRepos fetches and returns all the repos of the logged in user.
 var getRepos = func() ([]*github.Repository, error) {
 	client := rootCommand.gclient.GetClient()
 	// User should be fetched only after the above client init, else user remains
@@ -74,6 +81,20 @@ var getRepos = func() ([]*github.Repository, error) {
 	return repos, nil
 }
 
+// renderTable extracts the given github repos and renders a table using the
+// extracted data.
+var renderTable = func(repos []*github.Repository) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader(headers)
+
+	for _, repo := range repos {
+		r := newRepo(repo)
+		table.Append(r.RepoString())
+	}
+
+	table.Render()
+}
+
 func RunGetRepos(cmd *cobra.Command, args []string, out io.Writer, c *GetRepoOptions) error {
 	if len(args) > 0 {
 		return cmd.Help()
@@ -83,15 +104,7 @@ func RunGetRepos(cmd *cobra.Command, args []string, out io.Writer, c *GetRepoOpt
 		return err
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"REPO", "LANGUAGE", "STARS", "FORKS"})
-
-	for _, repo := range repos {
-		r := newRepo(repo)
-		table.Append(r.RepoString())
-	}
-
-	table.Render()
+	renderTable(repos)
 
 	return nil
 }

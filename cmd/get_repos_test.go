@@ -9,7 +9,7 @@ import (
 )
 
 func getFakeRepo(url string, lang string, stars int, forks int) github.Repository {
-	// NEED HELP in cleaning this dirty.
+	// NEED HELP in cleaning this dirt.
 	urlPtr := new(string)
 	*urlPtr = url
 	langPtr := new(string)

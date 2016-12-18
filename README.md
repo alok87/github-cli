@@ -11,7 +11,7 @@ Perform github tasks from command line.
 
 Install the cli with the following command
 ```bash
-> go get github.com/alok87/github-cli
+> go get -u github.com/alok87/github-cli
 ```
 
 ## Usage

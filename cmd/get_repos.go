@@ -11,6 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const defaultReposPerPage = 10
+
+var reposPerPage int
 var headers = []string{"REPO", "LANGUAGE", "STARS", "FORKS"}
 
 type GetRepoOptions struct {
@@ -48,6 +51,10 @@ func NewCmdGetRepos(out io.Writer) *cobra.Command {
 		},
 	}
 
+	// `limit` flag, with default 10, to fetch limited number of repos at a time.
+	cmd.Flags().IntVarP(&reposPerPage, "limit", "l",
+		defaultReposPerPage, "number of repos to fetch")
+
 	return cmd
 }
 
@@ -68,7 +75,9 @@ var getRepos = func() ([]*github.Repository, error) {
 	// User should be fetched only after the above client init, else user remains
 	// empty.
 	user := rootCommand.gclient.User
-	opt := &github.RepositoryListOptions{Type: "all", Sort: "updated"}
+	opt := &github.RepositoryListOptions{
+		Type: "all", Sort: "updated",
+		ListOptions: github.ListOptions{PerPage: reposPerPage}}
 	repos, _, err := client.Repositories.List(user, opt)
 	if err != nil {
 		return nil, err

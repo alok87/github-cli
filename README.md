@@ -1,5 +1,7 @@
 # github-cli
 
+[![Build Status](https://travis-ci.org/alok87/github-cli.svg?branch=master)](https://travis-ci.org/alok87/github-cli)
+
 Perform github tasks from command line.
 
 ## Prerequisite
@@ -15,10 +17,6 @@ Install the cli with the following command
 ```
 
 ## Usage
-
-![Help](http://i.imgur.com/owpwAbc.png)
-
-## Features
 
 ### Login
 * Setup Login to access Github

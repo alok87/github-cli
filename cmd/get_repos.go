@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 
@@ -36,26 +35,22 @@ func (r Repo) RepoString() []string {
 		strconv.Itoa(r.Stars), strconv.Itoa(r.Forks)}
 }
 
-func NewCmdGetRepos(out io.Writer) *cobra.Command {
-	options := &GetRepoOptions{}
+var getRepoOptions = &GetRepoOptions{}
+var getReposCmd = &cobra.Command{
+	Use:   "repos",
+	Short: "Get repo",
+	Long:  `Gets the list of Github repos for the logged user`,
+	Run: func(cmd *cobra.Command, args []string) {
+		err := RunGetRepos(cmd, args, getRepoOptions)
+		if err != nil {
+			exitWithError(err)
+		}
+	},
+}
 
-	cmd := &cobra.Command{
-		Use:   "repos",
-		Short: "Get repo",
-		Long:  `Gets the list of Github repos for the logged user`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := RunGetRepos(cmd, args, out, options)
-			if err != nil {
-				exitWithError(err)
-			}
-		},
-	}
-
-	// `limit` flag, with default 10, to fetch limited number of repos at a time.
-	cmd.Flags().IntVarP(&reposPerPage, "limit", "l",
+func init() {
+	getReposCmd.Flags().IntVarP(&reposPerPage, "limit", "l",
 		defaultReposPerPage, "number of repos to fetch")
-
-	return cmd
 }
 
 // newRepo creates a new Repo object, given a github repository.
@@ -71,10 +66,8 @@ var newRepo = func(r *github.Repository) Repo {
 
 // getRepos fetches and returns all the repos of the logged in user.
 var getRepos = func() ([]*github.Repository, error) {
-	client := rootCommand.gclient.GetClient()
-	// User should be fetched only after the above client init, else user remains
-	// empty.
-	user := rootCommand.gclient.User
+	client := gc.GetClient()
+	user := gc.User
 	opt := &github.RepositoryListOptions{
 		Type: "all", Sort: "updated",
 		ListOptions: github.ListOptions{PerPage: reposPerPage}}
@@ -104,7 +97,7 @@ var renderTable = func(repos []*github.Repository) {
 	table.Render()
 }
 
-func RunGetRepos(cmd *cobra.Command, args []string, out io.Writer, c *GetRepoOptions) error {
+func RunGetRepos(cmd *cobra.Command, args []string, c *GetRepoOptions) error {
 	if len(args) > 0 {
 		return cmd.Help()
 	}

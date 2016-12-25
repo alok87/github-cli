@@ -3,7 +3,6 @@ package cmd
 import (
 	goflag "flag"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/alok87/github-cli/pkg/ghub"
@@ -11,49 +10,26 @@ import (
 	"github.com/spf13/viper"
 )
 
-type RootCmd struct {
-	configFile   string
-	cobraCommand *cobra.Command
-	gclient      *ghub.Gclient
-}
+var gc = &ghub.Gclient{Name: "Github Client"}
+var configFile string
 
-var rootCommand = RootCmd{
-	cobraCommand: &cobra.Command{
-		Use:   "github-cli",
-		Short: "Use github-cli to perform github tasks.",
-		Long:  "Use github-cli to perform github tasks.",
-	},
-	gclient: &ghub.Gclient{
-		Name: "Github Client",
-	},
+var RootCmd = &cobra.Command{
+	Use:   "github-cli",
+	Short: "Use github-cli to perform github tasks.",
+	Long:  "Use github-cli to perform github tasks.",
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	NewCmdRoot(os.Stdout)
-}
-
-func NewCmdRoot(out io.Writer) *cobra.Command {
-	//options := &RootOptions{}
-	cmd := rootCommand.cobraCommand
-
-	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
-	cmd.PersistentFlags().StringVar(&rootCommand.configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
-
-	// create subcommands
-	cmd.AddCommand(NewCmdLogin(out))
-	cmd.AddCommand(NewCmdGet(out))
-	cmd.AddCommand(NewCmdCreate(out))
-	cmd.AddCommand(NewCmdDelete(out))
-
-	return cmd
+	RootCmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
+	RootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if rootCommand.configFile != "" {
+	if configFile != "" {
 		// enable ability to specify config file via flag
-		viper.SetConfigFile(rootCommand.configFile)
+		viper.SetConfigFile(configFile)
 	}
 
 	viper.SetConfigName(".github-cli") // name of config file (without extension)
@@ -73,14 +49,10 @@ func initConfig() {
 	}
 }
 
-func (c *RootCmd) AddCommand(cmd *cobra.Command) {
-	c.cobraCommand.AddCommand(cmd)
-}
-
 func Execute() {
 	goflag.Set("logtostderr", "true")
 	goflag.CommandLine.Parse([]string{})
-	if err := rootCommand.cobraCommand.Execute(); err != nil {
+	if err := RootCmd.Execute(); err != nil {
 		exitWithError(err)
 	}
 }

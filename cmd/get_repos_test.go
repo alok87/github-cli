@@ -22,7 +22,7 @@ func getFakeRepo(url string, lang string, stars int, forks int) github.Repositor
 		StargazersCount: starsPtr, ForksCount: forksPtr}
 }
 
-func TestRepo(t *testing.T) {
+func TestGetRepos(t *testing.T) {
 	cases := []struct {
 		url   string
 		lang  string

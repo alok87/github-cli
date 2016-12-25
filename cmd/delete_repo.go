@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/alok87/github-cli/pkg/utils"
@@ -14,32 +13,25 @@ type DeleteRepoOptions struct {
 	IsPrivate string
 }
 
-func NewCmdDeleteRepo(out io.Writer) *cobra.Command {
-	options := &DeleteRepoOptions{}
-
-	cmd := &cobra.Command{
-		Use:   "repo [name]",
-		Short: "Delete repo",
-		Long:  `Deletes a Github repo.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := RunDeleteRepo(cmd, args, out, options)
-			if err != nil {
-				exitWithError(err)
-			}
-		},
-	}
-
-	return cmd
+var deleteRepoOptions = &DeleteRepoOptions{}
+var deleteRepoCmd = &cobra.Command{
+	Use:   "repo [name]",
+	Short: "Delete repo",
+	Long:  `Deletes a Github repo.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		err := RunDeleteRepo(cmd, args, deleteRepoOptions)
+		if err != nil {
+			exitWithError(err)
+		}
+	},
 }
 
-func RunDeleteRepo(cmd *cobra.Command, args []string, out io.Writer, o *DeleteRepoOptions) error {
+func RunDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) error {
 	if len(args) != 1 {
 		return cmd.Help()
 	}
 	repoName := args[0]
-	// client := rootCommand.gclient.GetClient()
 	client := gc.GetClient()
-	// user := rootCommand.gclient.User
 	user := gc.User
 	repoUrl := user + "/" + repoName
 	c := utils.AskForConfirmation("Are you sure you want to delete " + repoUrl + " ?")

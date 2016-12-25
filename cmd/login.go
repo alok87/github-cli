@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -12,23 +11,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewCmdLogin(out io.Writer) *cobra.Command {
-
-	cmd := &cobra.Command{
-		Use:   "login [oauth-token]",
-		Short: "Setup login for accessing Github",
-		Run: func(cmd *cobra.Command, args []string) {
-			err := RunLogin(cmd, args, out)
-			if err != nil {
-				exitWithError(err)
-			}
-		},
-	}
-
-	return cmd
+var loginCmd = &cobra.Command{
+	Use:   "login [oauth-token]",
+	Short: "Setup login for accessing Github",
+	Run: func(cmd *cobra.Command, args []string) {
+		err := RunLogin(cmd, args)
+		if err != nil {
+			exitWithError(err)
+		}
+	},
 }
 
-func RunLogin(cmd *cobra.Command, args []string, out io.Writer) error {
+func init() {
+	RootCmd.AddCommand(loginCmd)
+}
+
+func RunLogin(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return cmd.Help()
 	}
@@ -75,7 +73,6 @@ func RunLogin(cmd *cobra.Command, args []string, out io.Writer) error {
 		}
 		configYaml = []byte(output)
 	}
-	// err := rootCommand.gclient.CheckConnection(gitOauth)
 	err := gc.CheckConnection(gitOauth)
 	if err != nil {
 		if madeConfigFile {

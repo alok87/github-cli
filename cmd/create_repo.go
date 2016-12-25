@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -14,25 +13,20 @@ type CreateRepoOptions struct {
 	IsPrivate string
 }
 
-func NewCmdCreateRepo(out io.Writer) *cobra.Command {
-	options := &CreateRepoOptions{}
-
-	cmd := &cobra.Command{
-		Use:   "repo [name]",
-		Short: "Create repo",
-		Long:  `Creates a Github repo.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := RunCreateRepo(cmd, args, out, options)
-			if err != nil {
-				exitWithError(err)
-			}
-		},
-	}
-
-	return cmd
+var createRepoOptions = &CreateRepoOptions{}
+var createRepoCmd = &cobra.Command{
+	Use:   "repo [name]",
+	Short: "Create repo",
+	Long:  `Creates a Github repo.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		err := RunCreateRepo(cmd, args, createRepoOptions)
+		if err != nil {
+			exitWithError(err)
+		}
+	},
 }
 
-func RunCreateRepo(cmd *cobra.Command, args []string, out io.Writer, c *CreateRepoOptions) error {
+func RunCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) error {
 	if len(args) != 1 {
 		return cmd.Help()
 	}

@@ -61,9 +61,7 @@ func (c *Gclient) GetClient() *github.Client {
 }
 
 func (c *Gclient) SetUser() string {
-	fmt.Println("Setting User!!!")
 	currentUser, _, _ := c.client.Users.Get("")
-	fmt.Println(*currentUser.Login)
 	c.User = *currentUser.Login
 	return c.User
 }

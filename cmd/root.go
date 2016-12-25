@@ -17,6 +17,9 @@ type RootCmd struct {
 	gclient      *ghub.Gclient
 }
 
+var gc = &ghub.Gclient{Name: "Github Client"}
+var configFile string
+
 var rootCommand = RootCmd{
 	cobraCommand: &cobra.Command{
 		Use:   "github-cli",
@@ -38,7 +41,7 @@ func NewCmdRoot(out io.Writer) *cobra.Command {
 	cmd := rootCommand.cobraCommand
 
 	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
-	cmd.PersistentFlags().StringVar(&rootCommand.configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
+	cmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
 
 	// create subcommands
 	cmd.AddCommand(NewCmdLogin(out))
@@ -51,9 +54,9 @@ func NewCmdRoot(out io.Writer) *cobra.Command {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if rootCommand.configFile != "" {
+	if configFile != "" {
 		// enable ability to specify config file via flag
-		viper.SetConfigFile(rootCommand.configFile)
+		viper.SetConfigFile(configFile)
 	}
 
 	viper.SetConfigName(".github-cli") // name of config file (without extension)

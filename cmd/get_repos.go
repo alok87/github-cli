@@ -71,10 +71,12 @@ var newRepo = func(r *github.Repository) Repo {
 
 // getRepos fetches and returns all the repos of the logged in user.
 var getRepos = func() ([]*github.Repository, error) {
-	client := rootCommand.gclient.GetClient()
+	// client := rootCommand.gclient.GetClient()
+	client := gc.GetClient()
 	// User should be fetched only after the above client init, else user remains
 	// empty.
-	user := rootCommand.gclient.User
+	// user := rootCommand.gclient.User
+	user := gc.User
 	opt := &github.RepositoryListOptions{
 		Type: "all", Sort: "updated",
 		ListOptions: github.ListOptions{PerPage: reposPerPage}}

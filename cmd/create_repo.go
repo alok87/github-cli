@@ -38,7 +38,8 @@ func RunCreateRepo(cmd *cobra.Command, args []string, out io.Writer, c *CreateRe
 	}
 	repoName := args[0]
 
-	client := rootCommand.gclient.GetClient()
+	// client := rootCommand.gclient.GetClient()
+	client := gc.GetClient()
 	repo := &github.Repository{
 		Name:    github.String(repoName),
 		Private: github.Bool(false),

@@ -37,8 +37,10 @@ func RunDeleteRepo(cmd *cobra.Command, args []string, out io.Writer, o *DeleteRe
 		return cmd.Help()
 	}
 	repoName := args[0]
-	client := rootCommand.gclient.GetClient()
-	user := rootCommand.gclient.User
+	// client := rootCommand.gclient.GetClient()
+	client := gc.GetClient()
+	// user := rootCommand.gclient.User
+	user := gc.User
 	repoUrl := user + "/" + repoName
 	c := utils.AskForConfirmation("Are you sure you want to delete " + repoUrl + " ?")
 	if c {

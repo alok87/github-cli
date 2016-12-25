@@ -75,7 +75,8 @@ func RunLogin(cmd *cobra.Command, args []string, out io.Writer) error {
 		}
 		configYaml = []byte(output)
 	}
-	err := rootCommand.gclient.CheckConnection(gitOauth)
+	// err := rootCommand.gclient.CheckConnection(gitOauth)
+	err := gc.CheckConnection(gitOauth)
 	if err != nil {
 		if madeConfigFile {
 			err_del := os.Remove(configFile)

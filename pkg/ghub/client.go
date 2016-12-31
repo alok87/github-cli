@@ -17,15 +17,16 @@ type Gclient struct {
 	User   string
 }
 
+var ConfigName = ".github-cli"
+var ConfigType = "yaml"
+
 func (c *Gclient) SetClient() {
 	var gitOauth string
-	configName := ".github-cli"
-	configType := "yaml"
 
 	// TODO: Find a better approach than intializing config in this way
-	viper.SetConfigName(configName)
+	viper.SetConfigName(ConfigName)
 	viper.AddConfigPath("$HOME")
-	viper.SetConfigType(configType)
+	viper.SetConfigType(ConfigType)
 
 	if err := viper.ReadInConfig(); err == nil {
 		if viper.IsSet("git_oauth") {

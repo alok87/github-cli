@@ -48,8 +48,8 @@ Install the cli with the following command
 ### Development Setup
 
 1. Clone the repo & `cd` into it.
-2. Ensure that [`govendor`](https://github.com/kardianos/govendor) is installed
-and install all the vendor dependencies with `govendor sync`.
+2. Ensure that dep ([golang/dep](https://github.com/golang/dep/)) is installed
+and install all the vendor dependencies with `dep ensure -vendor-only`.
 3. Install with:
 ```
 go install github.com/alok87/github-cli
@@ -57,9 +57,9 @@ go install github.com/alok87/github-cli
 
 #### Dependencies
 
-Add new dependencies with `govendor fetch <packagename>`. This would install
-the dependencies under `vendor/` and add them to `vendor/vendor.json`, which
-should be checked-in.
+Add new dependencies with `dep ensure -add <projectname>`. This would install
+the dependencies under `vendor/` and add an entry in `Gopkg.toml` and
+`Gopkg.lock`, which should be checked-in.
 
 
 ### Resources:

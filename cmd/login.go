@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -73,7 +74,9 @@ func RunLogin(cmd *cobra.Command, args []string) error {
 		}
 		configYaml = []byte(output)
 	}
-	err := gc.CheckConnection(gitOauth)
+
+	ctx := context.Background()
+	err := gc.CheckConnection(ctx, gitOauth)
 	if err != nil {
 		if madeConfigFile {
 			err_del := os.Remove(configFile)

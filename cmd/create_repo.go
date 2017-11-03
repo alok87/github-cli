@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -32,13 +33,13 @@ func RunCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) erro
 	}
 	repoName := args[0]
 
-	// client := rootCommand.gclient.GetClient()
-	client := gc.GetClient()
+	ctx := context.Background()
+	client := gc.GetClient(ctx)
 	repo := &github.Repository{
 		Name:    github.String(repoName),
 		Private: github.Bool(false),
 	}
-	_, _, err := client.Repositories.Create("", repo)
+	_, _, err := client.Repositories.Create(ctx, "", repo)
 	if err != nil {
 		if strings.Fields(err.Error())[2] == "422" {
 			exitWithError(fmt.Errorf("Repo %s already exists", repoName))

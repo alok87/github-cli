@@ -1,6 +1,7 @@
 package ghub
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -55,25 +56,25 @@ func (c *Gclient) SetClient() {
 	c.client = github.NewClient(tc)
 }
 
-func (c *Gclient) GetClient() *github.Client {
+func (c *Gclient) GetClient(ctx context.Context) *github.Client {
 	c.SetClient()
-	c.SetUser()
+	c.SetUser(ctx)
 	return c.client
 }
 
-func (c *Gclient) SetUser() string {
-	currentUser, _, _ := c.client.Users.Get("")
+func (c *Gclient) SetUser(ctx context.Context) string {
+	currentUser, _, _ := c.client.Users.Get(ctx, "")
 	c.User = *currentUser.Login
 	return c.User
 }
 
-func (c *Gclient) CheckConnection(gitOauth string) error {
+func (c *Gclient) CheckConnection(ctx context.Context, gitOauth string) error {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitOauth},
 	)
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 	client := github.NewClient(tc)
-	_, _, err := client.Users.Get("")
+	_, _, err := client.Users.Get(ctx, "")
 	return err
 }
 

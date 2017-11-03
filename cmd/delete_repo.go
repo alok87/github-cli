@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -31,12 +32,14 @@ func RunDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) erro
 		return cmd.Help()
 	}
 	repoName := args[0]
-	client := gc.GetClient()
+
+	ctx := context.Background()
+	client := gc.GetClient(ctx)
 	user := gc.User
 	repoUrl := user + "/" + repoName
 	c := utils.AskForConfirmation("Are you sure you want to delete " + repoUrl + " ?")
 	if c {
-		_, err := client.Repositories.Delete(user, repoName)
+		_, err := client.Repositories.Delete(ctx, user, repoName)
 		if err != nil {
 			if strings.Fields(err.Error())[2] == "404" {
 				exitWithError(fmt.Errorf("Repo %s does not exist", repoName))

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -66,12 +67,13 @@ var newRepo = func(r *github.Repository) Repo {
 
 // getRepos fetches and returns all the repos of the logged in user.
 var getRepos = func() ([]*github.Repository, error) {
-	client := gc.GetClient()
+	ctx := context.Background()
+	client := gc.GetClient(ctx)
 	user := gc.User
 	opt := &github.RepositoryListOptions{
 		Type: "all", Sort: "updated",
 		ListOptions: github.ListOptions{PerPage: reposPerPage}}
-	repos, _, err := client.Repositories.List(user, opt)
+	repos, _, err := client.Repositories.List(ctx, user, opt)
 	if err != nil {
 		return nil, err
 	}

@@ -12,16 +12,20 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Gclient is ghub client struct.
 type Gclient struct {
 	Name   string
 	client *github.Client
 	User   string
 }
 
+// ConfigName is the configuration file name.
 var ConfigName = ".github-cli"
+
+// ConfigType is the configuration file type.
 var ConfigType = "yaml"
 
-func (c *Gclient) SetClient() {
+func (c *Gclient) setClient(ctx context.Context) {
 	var gitOauth string
 
 	// TODO: Find a better approach than intializing config in this way
@@ -52,27 +56,29 @@ func (c *Gclient) SetClient() {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitOauth},
 	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(ctx, ts)
 	c.client = github.NewClient(tc)
 }
 
+// GetClient returns ghub client.
 func (c *Gclient) GetClient(ctx context.Context) *github.Client {
-	c.SetClient()
-	c.SetUser(ctx)
+	c.setClient(ctx)
+	c.setUser(ctx)
 	return c.client
 }
 
-func (c *Gclient) SetUser(ctx context.Context) string {
+func (c *Gclient) setUser(ctx context.Context) string {
 	currentUser, _, _ := c.client.Users.Get(ctx, "")
 	c.User = *currentUser.Login
 	return c.User
 }
 
+// CheckConnection checks the connection to github.
 func (c *Gclient) CheckConnection(ctx context.Context, gitOauth string) error {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitOauth},
 	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 	_, _, err := client.Users.Get(ctx, "")
 	return err

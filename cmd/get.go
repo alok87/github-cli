@@ -13,6 +13,6 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(getCmd)
 	getCmd.AddCommand(getReposCmd)
 }

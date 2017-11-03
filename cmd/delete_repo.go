@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// DeleteRepoOptions holds options for deleting a repo.
 type DeleteRepoOptions struct {
 	Name      string
 	IsPrivate string
@@ -20,14 +21,14 @@ var deleteRepoCmd = &cobra.Command{
 	Short: "Delete repo",
 	Long:  `Deletes a Github repo.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := RunDeleteRepo(cmd, args, deleteRepoOptions)
+		err := runDeleteRepo(cmd, args, deleteRepoOptions)
 		if err != nil {
 			exitWithError(err)
 		}
 	},
 }
 
-func RunDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) error {
+func runDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) error {
 	if len(args) != 1 {
 		return cmd.Help()
 	}
@@ -36,8 +37,8 @@ func RunDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) erro
 	ctx := context.Background()
 	client := gc.GetClient(ctx)
 	user := gc.User
-	repoUrl := user + "/" + repoName
-	c := utils.AskForConfirmation("Are you sure you want to delete " + repoUrl + " ?")
+	repoURL := user + "/" + repoName
+	c := utils.AskForConfirmation("Are you sure you want to delete " + repoURL + " ?")
 	if c {
 		_, err := client.Repositories.Delete(ctx, user, repoName)
 		if err != nil {

@@ -13,7 +13,7 @@ import (
 var gc = &ghub.Gclient{Name: "Github Client"}
 var configFile string
 
-var RootCmd = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "github-cli",
 	Short: "Use github-cli to perform github tasks.",
 	Long:  "Use github-cli to perform github tasks.",
@@ -21,8 +21,8 @@ var RootCmd = &cobra.Command{
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	RootCmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
-	RootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
+	rootCmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
+	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is $HOME/.github-cli.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -49,10 +49,11 @@ func initConfig() {
 	}
 }
 
+// Execute runs the root command.
 func Execute() {
 	goflag.Set("logtostderr", "true")
 	goflag.CommandLine.Parse([]string{})
-	if err := RootCmd.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		exitWithError(err)
 	}
 }

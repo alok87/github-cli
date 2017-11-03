@@ -16,12 +16,13 @@ const defaultReposPerPage = 10
 var reposPerPage int
 var headers = []string{"REPO", "LANGUAGE", "STARS", "FORKS"}
 
+// GetRepoOptions holds options for fetching repo.
 type GetRepoOptions struct {
 	Name      string
 	IsPrivate string
 }
 
-// Struct of a Repo that is used in get_repos table view.
+// Repo is struct of a repo that is used in get_repos table view.
 type Repo struct {
 	URL      string
 	Language string
@@ -42,7 +43,7 @@ var getReposCmd = &cobra.Command{
 	Short: "Get repo",
 	Long:  `Gets the list of Github repos for the logged user`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := RunGetRepos(cmd, args, getRepoOptions)
+		err := runGetRepos(cmd, args, getRepoOptions)
 		if err != nil {
 			exitWithError(err)
 		}
@@ -99,7 +100,7 @@ var renderTable = func(repos []*github.Repository) {
 	table.Render()
 }
 
-func RunGetRepos(cmd *cobra.Command, args []string, c *GetRepoOptions) error {
+func runGetRepos(cmd *cobra.Command, args []string, c *GetRepoOptions) error {
 	if len(args) > 0 {
 		return cmd.Help()
 	}

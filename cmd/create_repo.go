@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CreateRepoOptions holds options for creating a repo.
 type CreateRepoOptions struct {
 	Name      string
 	IsPrivate string
@@ -20,14 +21,14 @@ var createRepoCmd = &cobra.Command{
 	Short: "Create repo",
 	Long:  `Creates a Github repo.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := RunCreateRepo(cmd, args, createRepoOptions)
+		err := runCreateRepo(cmd, args, createRepoOptions)
 		if err != nil {
 			exitWithError(err)
 		}
 	},
 }
 
-func RunCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) error {
+func runCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) error {
 	if len(args) != 1 {
 		return cmd.Help()
 	}

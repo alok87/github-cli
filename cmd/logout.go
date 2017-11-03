@@ -23,7 +23,7 @@ var logoutCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(logoutCmd)
+	rootCmd.AddCommand(logoutCmd)
 }
 
 // deleteFile is an abstraction over `os.Remove` for deleting a file.

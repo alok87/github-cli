@@ -13,6 +13,6 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(createCmd)
 	createCmd.AddCommand(createRepoCmd)
 }

@@ -16,7 +16,7 @@ var loginCmd = &cobra.Command{
 	Use:   "login [oauth-token]",
 	Short: "Setup login for accessing Github",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := RunLogin(cmd, args)
+		err := runLogin(cmd, args)
 		if err != nil {
 			exitWithError(err)
 		}
@@ -24,10 +24,10 @@ var loginCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(loginCmd)
 }
 
-func RunLogin(cmd *cobra.Command, args []string) error {
+func runLogin(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return cmd.Help()
 	}
@@ -79,8 +79,7 @@ func RunLogin(cmd *cobra.Command, args []string) error {
 	err := gc.CheckConnection(ctx, gitOauth)
 	if err != nil {
 		if madeConfigFile {
-			err_del := os.Remove(configFile)
-			if err_del != nil {
+			if err := os.Remove(configFile); err != nil {
 				exitWithError(fmt.Errorf("Could not delete config: %s", configFile))
 			}
 		}

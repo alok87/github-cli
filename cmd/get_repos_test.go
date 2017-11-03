@@ -59,10 +59,10 @@ func TestGetRepos(t *testing.T) {
 			t.Fatalf("Expected Language to be %s but got %s", c.lang, repo.Language)
 		}
 		if !reflect.DeepEqual(repo.Stars, c.stars) {
-			t.Fatalf("Expected Stars to be %s but got %v", c.stars, repo.Stars)
+			t.Fatalf("Expected Stars to be %d but got %v", c.stars, repo.Stars)
 		}
 		if !reflect.DeepEqual(repo.Forks, c.forks) {
-			t.Fatalf("Expected Forks to be %s but got %v", c.forks, repo.Forks)
+			t.Fatalf("Expected Forks to be %d but got %v", c.forks, repo.Forks)
 		}
 		str := repo.RepoString()
 		expected := []string{c.url, c.lang, strconv.Itoa(c.stars),
@@ -73,13 +73,13 @@ func TestGetRepos(t *testing.T) {
 	}
 
 	// Test newRepo for replacing nil language with "-"
-	fUrl := new(string)
-	*fUrl = "foo"
+	fURL := new(string)
+	*fURL = "foo"
 	fStars := new(int)
 	*fStars = 3
 	fForks := new(int)
 	*fForks = 9
-	nilLangRepo := github.Repository{HTMLURL: fUrl, Language: nil,
+	nilLangRepo := github.Repository{HTMLURL: fURL, Language: nil,
 		StargazersCount: fStars, ForksCount: fForks}
 	repo := newRepo(&nilLangRepo)
 	if repo.Language != "-" {

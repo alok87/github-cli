@@ -35,7 +35,10 @@ func runDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) erro
 	repoName := args[0]
 
 	ctx := context.Background()
-	client := gc.GetClient(ctx)
+	client, err := gc.GetClient(ctx)
+	if err != nil {
+		return err
+	}
 	user := gc.User
 	repoURL := user + "/" + repoName
 	c := utils.AskForConfirmation("Are you sure you want to delete " + repoURL + " ?")
@@ -46,7 +49,7 @@ func runDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) erro
 				exitWithError(fmt.Errorf("Repo %s does not exist", repoName))
 			}
 		}
-		fmt.Printf("Repo %s deleted in github", repoName)
+		fmt.Printf("Repo %s deleted in github.\n", repoName)
 	}
 	return nil
 }

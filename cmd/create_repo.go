@@ -35,18 +35,21 @@ func runCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) erro
 	repoName := args[0]
 
 	ctx := context.Background()
-	client := gc.GetClient(ctx)
+	client, err := gc.GetClient(ctx)
+	if err != nil {
+		return err
+	}
 	repo := &github.Repository{
 		Name:    github.String(repoName),
 		Private: github.Bool(false),
 	}
-	_, _, err := client.Repositories.Create(ctx, "", repo)
+	_, _, err = client.Repositories.Create(ctx, "", repo)
 	if err != nil {
 		if strings.Fields(err.Error())[2] == "422" {
 			exitWithError(fmt.Errorf("Repo %s already exists", repoName))
 		}
 		exitWithError(err)
 	}
-	fmt.Printf("Repo %s created in github", repoName)
+	fmt.Printf("Repo %s created in github.\n", repoName)
 	return nil
 }

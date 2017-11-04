@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/google/go-github/github"
 	"github.com/spf13/cobra"
@@ -39,16 +38,25 @@ func runCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) erro
 	if err != nil {
 		return err
 	}
+
 	repo := &github.Repository{
 		Name:    github.String(repoName),
 		Private: github.Bool(false),
 	}
 	_, _, err = client.Repositories.Create(ctx, "", repo)
 	if err != nil {
-		if strings.Fields(err.Error())[2] == "422" {
-			exitWithError(fmt.Errorf("Repo %s already exists", repoName))
+		// Convert error to github.ErrorResponse. Since "repo already exists" is
+		// a custom response, e.Code is "custom", which doesn't tell the exact
+		// reason. Hence, compare the error message to ensure it's an already
+		// existing repo error.
+		// https://developer.github.com/v3/#client-errors
+		e := err.(*github.ErrorResponse).Errors
+		if len(e) > 0 {
+			if e[0].Message == "name already exists on this account" {
+				return fmt.Errorf("repo %s already exists", repoName)
+			}
 		}
-		exitWithError(err)
+		return err
 	}
 	fmt.Printf("Repo %s created in github.\n", repoName)
 	return nil

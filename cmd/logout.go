@@ -37,7 +37,7 @@ var deleteFile = func(filepath string) error {
 func deleteConfig() error {
 	homepath, err := homedir.Dir()
 	if err != nil {
-		exitWithError(err)
+		return err
 	}
 	configpath := path.Join(homepath, ghub.ConfigName) + "." + ghub.ConfigType
 	fmt.Printf("Deleting config file %s\n", configpath)

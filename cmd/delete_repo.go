@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/alok87/github-cli/pkg/utils"
+	"github.com/google/go-github/github"
 	"github.com/spf13/cobra"
 )
 
@@ -35,18 +35,25 @@ func runDeleteRepo(cmd *cobra.Command, args []string, o *DeleteRepoOptions) erro
 	repoName := args[0]
 
 	ctx := context.Background()
-	client := gc.GetClient(ctx)
+	client, err := gc.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
 	user := gc.User
 	repoURL := user + "/" + repoName
+
 	c := utils.AskForConfirmation("Are you sure you want to delete " + repoURL + " ?")
 	if c {
 		_, err := client.Repositories.Delete(ctx, user, repoName)
 		if err != nil {
-			if strings.Fields(err.Error())[2] == "404" {
-				exitWithError(fmt.Errorf("Repo %s does not exist", repoName))
+			if err.(*github.ErrorResponse).Response.StatusCode == 404 {
+				return fmt.Errorf("Repo %s does not exist", repoName)
 			}
+			return err
 		}
-		fmt.Printf("Repo %s deleted in github", repoName)
+		fmt.Printf("Repo %s deleted in github.\n", repoName)
 	}
+
 	return nil
 }

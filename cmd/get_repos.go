@@ -69,7 +69,10 @@ var newRepo = func(r *github.Repository) Repo {
 // getRepos fetches and returns all the repos of the logged in user.
 var getRepos = func() ([]*github.Repository, error) {
 	ctx := context.Background()
-	client := gc.GetClient(ctx)
+	client, err := gc.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 	user := gc.User
 	opt := &github.RepositoryListOptions{
 		Type: "all", Sort: "updated",

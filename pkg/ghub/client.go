@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/google/go-github/github"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 )
@@ -25,55 +26,71 @@ var ConfigName = ".github-cli"
 // ConfigType is the configuration file type.
 var ConfigType = "yaml"
 
-func (c *Gclient) setClient(ctx context.Context) {
+func (c *Gclient) setClient(ctx context.Context) error {
 	var gitOauth string
 
 	// TODO: Find a better approach than intializing config in this way
 	viper.SetConfigName(ConfigName)
-	viper.AddConfigPath("$HOME")
 	viper.SetConfigType(ConfigType)
+	viper.AddConfigPath("$HOME")
 
-	if err := viper.ReadInConfig(); err == nil {
-		if viper.IsSet("git_oauth") {
-			gitOauth = viper.GetString("git_oauth")
-		}
+	if err := viper.ReadInConfig(); err != nil {
+		return errors.Wrap(err, "unable to reading config")
+	}
+
+	if viper.IsSet("git_oauth") {
+		gitOauth = viper.GetString("git_oauth")
 	}
 
 	if len(gitOauth) == 0 {
-		fmt.Println("Login required !")
+		fmt.Println("Login required!")
+
+		// TODO: Replace syscalls with function calls.
 		binary, lookErr := exec.LookPath("github-cli")
 		if lookErr != nil {
-			exitWithError(fmt.Errorf("Binary github-cli not found"))
+			return errors.New("binary github-cli not found")
 		}
 		args := []string{"github-cli", "login"}
 		env := os.Environ()
 		execErr := syscall.Exec(binary, args, env)
 		if execErr != nil {
-			exitWithError(fmt.Errorf("Error running github-cli login"))
+			return errors.New("error running github-cli login")
 		}
-		exitWithError(fmt.Errorf("Login required"))
+		return errors.New("login required")
 	}
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitOauth},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 	c.client = github.NewClient(tc)
+
+	return nil
 }
 
 // GetClient returns ghub client.
-func (c *Gclient) GetClient(ctx context.Context) *github.Client {
-	c.setClient(ctx)
-	c.setUser(ctx)
-	return c.client
+func (c *Gclient) GetClient(ctx context.Context) (*github.Client, error) {
+	if err := c.setClient(ctx); err != nil {
+		return nil, err
+	}
+
+	if err := c.setUser(ctx); err != nil {
+		return nil, err
+	}
+
+	return c.client, nil
 }
 
-func (c *Gclient) setUser(ctx context.Context) string {
-	currentUser, _, _ := c.client.Users.Get(ctx, "")
+func (c *Gclient) setUser(ctx context.Context) error {
+	currentUser, _, err := c.client.Users.Get(ctx, "")
+	if err != nil {
+		return errors.Wrap(err, "unable to get user")
+	}
 	c.User = *currentUser.Login
-	return c.User
+
+	return nil
 }
 
-// CheckConnection checks the connection to github.
+// CheckConnection checks the connection to github with an OAuth token.
 func (c *Gclient) CheckConnection(ctx context.Context, gitOauth string) error {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitOauth},
@@ -82,11 +99,4 @@ func (c *Gclient) CheckConnection(ctx context.Context, gitOauth string) error {
 	client := github.NewClient(tc)
 	_, _, err := client.Users.Get(ctx, "")
 	return err
-}
-
-// exitWithError will terminate execution with an error result
-// It prints the error to stderr and exits with a non-zero exit code
-func exitWithError(err error) {
-	fmt.Fprintf(os.Stderr, "%v\n", err)
-	os.Exit(1)
 }

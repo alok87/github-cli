@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 
@@ -56,7 +57,7 @@ func init() {
 }
 
 // newRepo creates a new Repo object, given a github repository.
-var newRepo = func(r *github.Repository) Repo {
+func newRepo(r *github.Repository) Repo {
 	var lang string
 	if r.Language != nil {
 		lang = *r.Language
@@ -67,17 +68,18 @@ var newRepo = func(r *github.Repository) Repo {
 }
 
 // getRepos fetches and returns all the repos of the logged in user.
-var getRepos = func() ([]*github.Repository, error) {
+func getRepos() ([]*github.Repository, error) {
 	ctx := context.Background()
 	client, err := gc.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	user := gc.User
+
 	opt := &github.RepositoryListOptions{
 		Type: "all", Sort: "updated",
-		ListOptions: github.ListOptions{PerPage: reposPerPage}}
-	repos, _, err := client.Repositories.List(ctx, user, opt)
+		ListOptions: github.ListOptions{PerPage: reposPerPage},
+	}
+	repos, _, err := client.Repositories.List(ctx, gc.User, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +93,8 @@ var getRepos = func() ([]*github.Repository, error) {
 
 // renderTable extracts the given github repos and renders a table using the
 // extracted data.
-var renderTable = func(repos []*github.Repository) {
-	table := tablewriter.NewWriter(os.Stdout)
+func renderTable(repos []*github.Repository, writer io.Writer) {
+	table := tablewriter.NewWriter(writer)
 	table.SetHeader(headers)
 
 	for _, repo := range repos {
@@ -112,7 +114,7 @@ func runGetRepos(cmd *cobra.Command, args []string, c *GetRepoOptions) error {
 		return err
 	}
 
-	renderTable(repos)
+	renderTable(repos, os.Stdout)
 
 	return nil
 }

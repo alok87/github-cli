@@ -3,14 +3,8 @@ language: go
 go:
   - 1.9.x
 
-before_install:
-  - go get -u github.com/golang/dep/cmd/dep
-  - go get -u github.com/golang/lint/golint honnef.co/go/tools/cmd/megacheck
-
 install:
-  - dep ensure -vendor-only
+  - make dependencies
 
 script:
-  - PKGS=$(go list ./... | grep -vF /vendor/) && go vet $PKGS && golint $PKGS && megacheck $PKGS
-  - go test -v ./...
-  - go build -v
+  - make all

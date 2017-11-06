@@ -13,7 +13,7 @@ Perform github tasks from command line.
 
 Install the cli with the following command
 ```bash
-> go get -u github.com/alok87/github-cli
+$ go get -u github.com/alok87/github-cli
 ```
 
 ## Usage
@@ -21,25 +21,25 @@ Install the cli with the following command
 ### Login
 * Setup Login to access Github
 ```bash
-> github-cli login my_github_oauth_token
+$ github-cli login my_github_oauth_token
 ```
 
 ###  Get
 * Get Repos
 ```bash
-> github-cli get repos
+$ github-cli get repos
 ```
 
 ###  Create
 * Create Repo
 ```bash
-> github-cli create repo luna
+$ github-cli create repo luna
 ```
 
 ###  Delete
 * Delete Repo
 ```bash
-> github-cli delete repo luna
+$ github-cli delete repo luna
 ```
 
 
@@ -48,12 +48,8 @@ Install the cli with the following command
 ### Development Setup
 
 1. Clone the repo & `cd` into it.
-2. Ensure that dep ([golang/dep](https://github.com/golang/dep/)) is installed
-and install all the vendor dependencies with `dep ensure -vendor-only`.
-3. Install with:
-```
-go install github.com/alok87/github-cli
-```
+2. Run `make dependencies` to install all the dependencies.
+3. Run `make install` to build and install the binary.
 
 #### Dependencies
 

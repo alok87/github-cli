@@ -25,3 +25,7 @@
 [[constraint]]
   version = "0.8.0"
   name = "github.com/pkg/errors"
+
+[[constraint]]
+  branch = "v4"
+  name = "gopkg.in/src-d/go-git.v4"

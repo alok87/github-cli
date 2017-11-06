@@ -23,17 +23,17 @@ fmt: ## Run go fmt ./...
 	fi
 
 vet: ## Apply go vet to all the Go files.
-	@if [ "`go vet $(PKGS) | tee /dev/stderr`"]; then \
+	@if [ "`go vet $(PKGS) | tee /dev/stderr`" ]; then \
 		echo "^ go ver errors!" && echo && exit 1; \
 	fi
 
 megacheck: install-tools ## Apply megacheck to all the Go files.
-	@if [ "`megacheck $(PKGS) | tee /dev/stderr`"]; then \
+	@if [ "`megacheck $(PKGS) | tee /dev/stderr`" ]; then \
 		echo "^ megacheck errors!" && echo && exit 1; \
 	fi
 
 lint: install-tools ## Check for style mistakes in all the Go files using golint.
-	@if [ "`golint $(PKGS) | tee /dev/stderr`"]; then \
+	@if [ "`golint $(PKGS) | tee /dev/stderr`" ]; then \
 		echo "^ golint errors!" && echo && exit 1; \
 	fi
 

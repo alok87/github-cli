@@ -12,4 +12,5 @@ install:
 
 script:
   - PKGS=$(go list ./... | grep -vF /vendor/) && go vet $PKGS && golint $PKGS && megacheck $PKGS
+  - go test -v ./...
   - go build -v

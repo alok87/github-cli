@@ -1,88 +1,136 @@
 package cmd
 
 import (
-	"reflect"
-	"strconv"
+	"bytes"
 	"testing"
 
 	"github.com/google/go-github/github"
 )
 
-func getFakeRepo(url string, lang string, stars int, forks int) github.Repository {
-	// NEED HELP in cleaning this dirt.
-	urlPtr := new(string)
-	*urlPtr = url
-	langPtr := new(string)
-	*langPtr = lang
-	starsPtr := new(int)
-	*starsPtr = stars
-	forksPtr := new(int)
-	*forksPtr = forks
-	return github.Repository{HTMLURL: urlPtr, Language: langPtr,
-		StargazersCount: starsPtr, ForksCount: forksPtr}
-}
-
-func TestGetRepos(t *testing.T) {
-	cases := []struct {
-		url   string
-		lang  string
-		stars int
-		forks int
+func TestNewRepo(t *testing.T) {
+	testCases := []struct {
+		name         string
+		repo         *github.Repository
+		wantLanguage string
 	}{
 		{
-			url:   "example.com",
-			lang:  "Java",
-			stars: 5,
-			forks: 20,
+			name: "normal repo",
+			repo: &github.Repository{
+				HTMLURL:         stringPtr("repo"),
+				Language:        stringPtr("Java"),
+				StargazersCount: intPtr(1),
+				ForksCount:      intPtr(1),
+			},
+			wantLanguage: "Java",
 		},
 		{
-			url:   "",
-			lang:  "chinese",
-			stars: 0,
-			forks: 0,
-		},
-		{
-			url:   "foo.com",
-			lang:  "",
-			stars: 0,
-			forks: 0,
+			name: "repo with unknown language",
+			repo: &github.Repository{
+				HTMLURL:         stringPtr("repo"),
+				Language:        nil,
+				StargazersCount: intPtr(0),
+				ForksCount:      intPtr(0),
+			},
+			wantLanguage: "-",
 		},
 	}
 
-	for _, c := range cases {
-		fakeRepo := getFakeRepo(c.url, c.lang, c.stars, c.forks)
-		repo := newRepo(&fakeRepo)
-		if repo.URL != c.url {
-			t.Fatalf("Expected URL to be %s but got %s", c.url, repo.URL)
-		}
-		if repo.Language != c.lang {
-			t.Fatalf("Expected Language to be %s but got %s", c.lang, repo.Language)
-		}
-		if !reflect.DeepEqual(repo.Stars, c.stars) {
-			t.Fatalf("Expected Stars to be %d but got %v", c.stars, repo.Stars)
-		}
-		if !reflect.DeepEqual(repo.Forks, c.forks) {
-			t.Fatalf("Expected Forks to be %d but got %v", c.forks, repo.Forks)
-		}
-		str := repo.RepoString()
-		expected := []string{c.url, c.lang, strconv.Itoa(c.stars),
-			strconv.Itoa(c.forks)}
-		if !reflect.DeepEqual(str, expected) {
-			t.Fatalf("Expected %v but got %v", expected, str)
-		}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			r := newRepo(tc.repo)
+
+			if r.Language != tc.wantLanguage {
+				t.Errorf("unexpected repo language: \n\t(GOT) %v\n\t(WNT) %v", r.Language, tc.wantLanguage)
+			}
+		})
+	}
+}
+
+func TestRenderTable(t *testing.T) {
+	testCases := []struct {
+		name      string
+		repos     []*github.Repository
+		wantTable string
+	}{
+		{
+			name: "empty table",
+			wantTable: `
++------+----------+-------+-------+
+| REPO | LANGUAGE | STARS | FORKS |
++------+----------+-------+-------+
++------+----------+-------+-------+
+`,
+		},
+		{
+			name: "single repo table",
+			repos: []*github.Repository{
+				{
+					HTMLURL:         stringPtr("https://github.com/foo/bar"),
+					Language:        stringPtr("Go"),
+					StargazersCount: intPtr(5),
+					ForksCount:      intPtr(3),
+				},
+			},
+			wantTable: `
++----------------------------+----------+-------+-------+
+|            REPO            | LANGUAGE | STARS | FORKS |
++----------------------------+----------+-------+-------+
+| https://github.com/foo/bar | Go       |     5 |     3 |
++----------------------------+----------+-------+-------+
+`,
+		},
+		{
+			name: "multiple repo table",
+			repos: []*github.Repository{
+				{
+					HTMLURL:         stringPtr("reponame"),
+					Language:        stringPtr("Ruby"),
+					StargazersCount: intPtr(0),
+					ForksCount:      intPtr(0),
+				},
+				{
+					HTMLURL:         stringPtr("reponame2"),
+					Language:        nil,
+					StargazersCount: intPtr(100),
+					ForksCount:      intPtr(70),
+				},
+				{
+					HTMLURL:         stringPtr("reponame3"),
+					Language:        stringPtr("Javascript"),
+					StargazersCount: intPtr(3),
+					ForksCount:      intPtr(1),
+				},
+			},
+			wantTable: `
++-----------+------------+-------+-------+
+|   REPO    |  LANGUAGE  | STARS | FORKS |
++-----------+------------+-------+-------+
+| reponame  | Ruby       |     0 |     0 |
+| reponame2 |          - |   100 |    70 |
+| reponame3 | Javascript |     3 |     1 |
++-----------+------------+-------+-------+
+`,
+		},
 	}
 
-	// Test newRepo for replacing nil language with "-"
-	fURL := new(string)
-	*fURL = "foo"
-	fStars := new(int)
-	*fStars = 3
-	fForks := new(int)
-	*fForks = 9
-	nilLangRepo := github.Repository{HTMLURL: fURL, Language: nil,
-		StargazersCount: fStars, ForksCount: fForks}
-	repo := newRepo(&nilLangRepo)
-	if repo.Language != "-" {
-		t.Fatalf("Expected Language to be - but for %s", repo.Language)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Start with a newline to keep the wantTable pretty.
+			buf := bytes.NewBufferString("\n")
+
+			renderTable(tc.repos, buf)
+
+			if buf.String() != tc.wantTable {
+				t.Errorf("unexpected table output: \n\t(GOT) %v\n\t(WNT) %v", buf.String(), tc.wantTable)
+			}
+		})
 	}
+}
+
+func stringPtr(s string) *string {
+	return &s
+}
+
+func intPtr(i int) *int {
+	return &i
 }

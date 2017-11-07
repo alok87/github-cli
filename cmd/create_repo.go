@@ -3,9 +3,21 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/google/go-github/github"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
+)
+
+var remote bool
+
+var (
+	errAddRemoteNoRepo = errors.New("failed to add remote, current directory is not a git repo")
+	errAddRemoteExists = errors.New("failed to add remote \"origin\", remote already exists")
 )
 
 // CreateRepoOptions holds options for creating a repo.
@@ -25,6 +37,10 @@ var createRepoCmd = &cobra.Command{
 			exitWithError(err)
 		}
 	},
+}
+
+func init() {
+	createRepoCmd.Flags().BoolVarP(&remote, "remote", "r", false, "add a remote \"origin\" in current git repo associated with the created remote repo")
 }
 
 func runCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) error {
@@ -59,5 +75,49 @@ func runCreateRepo(cmd *cobra.Command, args []string, c *CreateRepoOptions) erro
 		return err
 	}
 	fmt.Printf("Repo %s created in github.\n", repoName)
+
+	if remote {
+		// Get the current repo path.
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+
+		if err := addRemote(gc.User, cwd, repoName); err != nil {
+			return err
+		}
+		fmt.Println("Added remote \"origin\".")
+	}
+
 	return nil
+}
+
+// addRemote adds a remote to a local repo.
+// username is the github username, repoPath is the path to local repo,
+// repoName is the remote repo name.
+func addRemote(username, repoPath, repoName string) error {
+	// Load the git repo at repoPath.
+	r, err := git.PlainOpen(repoPath)
+	if err != nil {
+		if err == git.ErrRepositoryNotExists {
+			return errAddRemoteNoRepo
+		}
+		return err
+	}
+
+	// Construct a remoteURL path.
+	remoteURL := "https://" + path.Join("github.com", username, repoName)
+	// Default refspec.
+	refSpec := config.RefSpec("+refs/heads/*:refs/remotes/origin/*")
+
+	config := config.RemoteConfig{
+		Name:  "origin",
+		URLs:  []string{remoteURL},
+		Fetch: []config.RefSpec{refSpec},
+	}
+	_, err = r.CreateRemote(&config)
+	if err == git.ErrRemoteExists {
+		return errAddRemoteExists
+	}
+	return err
 }

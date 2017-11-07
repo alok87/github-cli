@@ -15,9 +15,12 @@ import (
 
 // Gclient is ghub client struct.
 type Gclient struct {
-	Name   string
+	// Name of the client.
+	Name string
+	// Github username.
+	User string
+
 	client *github.Client
-	User   string
 }
 
 // ConfigName is the configuration file name.

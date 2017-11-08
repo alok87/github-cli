@@ -29,3 +29,7 @@
 [[constraint]]
   branch = "v4"
   name = "gopkg.in/src-d/go-git.v4"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/pkg/browser"

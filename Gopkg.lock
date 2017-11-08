@@ -80,6 +80,12 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/pkg/browser"
+  packages = ["."]
+  revision = "c90ca0c84f15f81c982e32665bffd8d7aac8f097"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -202,6 +208,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8695594fc4b1a3e0915637739c82d24653ca442d40c469d7c3d025949340e8c3"
+  inputs-digest = "75ad7ba9de64ebe6eb85d6aa5db75941f988b987f86217205645626337aa05a0"
   solver-name = "gps-cdcl"
   solver-version = 1
